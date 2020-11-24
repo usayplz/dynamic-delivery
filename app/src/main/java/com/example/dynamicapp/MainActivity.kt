@@ -12,6 +12,12 @@ import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import kotlinx.android.synthetic.main.activity_main.*
 
+/*
+    REQUIRES_USER_CONFIRMATION	The download requires user confirmation. This is most likely due to the size of the download being larger than 150 MB.
+    States: state.bytesDownloaded(), state.totalBytesToDownload(), state.errorCode()
+    Download option: manager.deferredInstall(arrayListOf(DYNAMIC_MODULE_NAME))
+*/
+
 class MainActivity : AppCompatActivity() {
     private val manager: SplitInstallManager by lazy { SplitInstallManagerFactory.create(this) }
 
@@ -51,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // manager.deferredInstall(arrayListOf(DYNAMIC_MODULE_NAME))
     private fun downloadModule() {
         val request = SplitInstallRequest.newBuilder()
             .addModule(DYNAMIC_MODULE_NAME)
@@ -60,8 +65,6 @@ class MainActivity : AppCompatActivity() {
         manager.startInstall(request)
     }
 
-    // REQUIRES_USER_CONFIRMATION	The download requires user confirmation. This is most likely due to the size of the download being larger than 150 MB.\
-    // state.bytesDownloaded(), state.totalBytesToDownload(), state.errorCode()
     private fun getSessionStateListener(state: SplitInstallSessionState) {
         when (state.status()) {
             SplitInstallSessionStatus.DOWNLOADING -> showToast("Downloading feature")
