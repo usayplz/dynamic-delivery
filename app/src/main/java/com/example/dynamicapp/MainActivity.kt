@@ -18,60 +18,58 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        bindDownloadButton()
-        bindOpenButton()
+        bindUseModuleButton()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CONFIRMATION_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_CANCELED) {
-                showToast("Install module cancelled")
+                showToast("Install module cancelled") // action if canceled
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private fun bindDownloadButton() {
-        download.setOnClickListener {
+    private fun bindUseModuleButton() {
+        useModule.setOnClickListener {
+            useDynamicModule()
+        }
+    }
+
+    private fun useDynamicModule() {
+        if (manager.installedModules.contains(DYNAMIC_MODULE_NAME)) {
+            openModule()
+        } else {
             downloadModule()
         }
     }
 
+    private fun openModule() {
+        val intent = Intent()
+        intent.setClassName(BuildConfig.APPLICATION_ID, "com.example.ondemand.OnDemandActivity")
+        startActivity(intent)
+    }
+
+    // manager.deferredInstall(arrayListOf(DYNAMIC_MODULE_NAME))
     private fun downloadModule() {
         val request = SplitInstallRequest.newBuilder()
             .addModule(DYNAMIC_MODULE_NAME)
             .build()
-
-        manager.registerListener(::processSessionState)
+        manager.registerListener(::getSessionStateListener)
         manager.startInstall(request)
     }
 
-    private fun processSessionState(state: SplitInstallSessionState) {
+    // REQUIRES_USER_CONFIRMATION	The download requires user confirmation. This is most likely due to the size of the download being larger than 150 MB.\
+    // state.bytesDownloaded(), state.totalBytesToDownload(), state.errorCode()
+    private fun getSessionStateListener(state: SplitInstallSessionState) {
         when (state.status()) {
             SplitInstallSessionStatus.DOWNLOADING -> showToast("Downloading feature")
             SplitInstallSessionStatus.FAILED -> showToast("Install failed (${state.errorCode()})")
             SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION ->
                 manager.startConfirmationDialogForResult(state, this, CONFIRMATION_REQUEST_CODE)
-            SplitInstallSessionStatus.INSTALLED -> {
-                showToast("Feature ready to be used")
-                updateDynamicFeatureButtonState()
-            }
+            SplitInstallSessionStatus.INSTALLED -> showToast("OnDemand module is ready to be used")
         }
-    }
-
-    private fun bindOpenButton() {
-        updateDynamicFeatureButtonState()
-        open.setOnClickListener {
-            val intent = Intent()
-            intent.setClassName(BuildConfig.APPLICATION_ID, "com.example.ondemand.OnDemandActivity")
-            startActivity(intent)
-        }
-    }
-
-    private fun updateDynamicFeatureButtonState() {
-        open.isEnabled = manager.installedModules.contains(DYNAMIC_MODULE_NAME)
     }
 
     private fun showToast(message: String) {

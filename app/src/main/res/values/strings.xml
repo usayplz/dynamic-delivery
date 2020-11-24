@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">DynamicApp</string>
     <string name="title_ondemand">On Demand</string>
-    <string name="download">Download</string>
-    <string name="open_feature">Open feature</string>
+    <string name="use">Use Dynamic Module</string>
 </resources>
