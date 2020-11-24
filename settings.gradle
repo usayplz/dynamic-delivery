@@ -1,2 +1,3 @@
+include ':ondemand'
 include ':app'
 rootProject.name = "DynamicApp"
