@@ -9,7 +9,16 @@
         android:id="@+id/mainFragment"
         android:name="com.example.dynamicapp.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_onDemandFragment"
+            app:destination="@id/onDemandFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/onDemandFragment"
+        android:name="com.example.ondemand.OnDemandFragment"
+        android:label="OnDemandFragment"
+        app:moduleName="ondemand" />
 
 </navigation>
